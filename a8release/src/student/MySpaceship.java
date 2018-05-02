@@ -8,6 +8,8 @@ import models.NodeStatus;
 import controllers.SearchPhase;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import controllers.RescuePhase;
@@ -15,6 +17,7 @@ import controllers.RescuePhase;
 /** An instance implements the methods needed to complete the mission. */
 public class MySpaceship implements Spaceship {
 	private HashMap<Integer, Boolean> visited = new HashMap<Integer, Boolean>();
+	private LinkedList<Integer> path = new LinkedList<Integer>();
 
 	/** The spaceship is on the location given by parameter state.
 	 * Move the spaceship to Planet X and then return (with the spaceship is on
@@ -45,26 +48,41 @@ public class MySpaceship implements Spaceship {
 		// TODO: Find the missing spaceship
 		if(state.onPlanetX())
 			return;
-		visited.put(state.currentID(), true);
+		if(!visited.containsKey(state.currentID()))
+			visited.put(state.currentID(), true);
 		NodeStatus ns = max(state.neighbors(), state);
+		while(ns == null) {
+			visited.put(state.currentID(), true);
+			state.moveTo(path.getFirst());
+			path.removeFirst();
+			ns = max(state.neighbors(), state);
+		}
+		path.addFirst(state.currentID());
 		state.moveTo(ns.id());
 		search(state);
 		
 	}
 	
 	private NodeStatus max(NodeStatus[] n, SearchPhase state) {
-		if(n.length == 1) {
-			visited.put(n[0].id(), true);
+		/*if(n.length <= 1) {
+			visited.put(state.currentID(), true);
 			return n[0];
-		}
+		}*/
 		NodeStatus best = null;
 		for(NodeStatus ns: n) {
-			if(visited.containsKey(ns))
+			if(visited.containsKey(ns.id()))
 				continue;
 			if(best == null) best = ns;
 			if(ns.compareTo(best) > 0)
 				best = ns;
 		}
+		/*if(best == null) {
+			for(NodeStatus ns: n) {
+				if(!visited.get(ns.id())) {
+					return ns;
+				}
+			}
+		}*/
 		return best;
 	}
 
@@ -87,9 +105,8 @@ public class MySpaceship implements Spaceship {
 	@Override
 	public void rescue(RescuePhase state) {
 		// TODO: Complete the rescue mission and collect gems
-		List<Node> ll = Paths.minPath(state.currentNode(), state.earth());
-		for(Node n: ll) {
-			state.moveTo(n);
-		}
+		LinkedList<Node> ll = (LinkedList) Paths.minPath(state.currentNode(), state.earth());
+		state.moveTo(ll.getLast());
+		return;
 	}
 }
