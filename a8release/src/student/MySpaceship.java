@@ -64,10 +64,6 @@ public class MySpaceship implements Spaceship {
 	}
 	
 	private NodeStatus max(NodeStatus[] n, SearchPhase state) {
-		/*if(n.length <= 1) {
-			visited.put(state.currentID(), true);
-			return n[0];
-		}*/
 		NodeStatus best = null;
 		for(NodeStatus ns: n) {
 			if(visited.containsKey(ns.id()))
@@ -76,13 +72,6 @@ public class MySpaceship implements Spaceship {
 			if(ns.compareTo(best) > 0)
 				best = ns;
 		}
-		/*if(best == null) {
-			for(NodeStatus ns: n) {
-				if(!visited.get(ns.id())) {
-					return ns;
-				}
-			}
-		}*/
 		return best;
 	}
 
