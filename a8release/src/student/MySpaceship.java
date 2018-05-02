@@ -95,7 +95,12 @@ public class MySpaceship implements Spaceship {
 	public void rescue(RescuePhase state) {
 		// TODO: Complete the rescue mission and collect gems
 		LinkedList<Node> ll = (LinkedList) Paths.minPath(state.currentNode(), state.earth());
-		state.moveTo(ll.getLast());
+		ll.removeLast();
+		int d = ll.size();
+		for(int i = 0; i < d; i++) {
+			state.moveTo(ll.getLast());
+			ll.removeLast();
+		}
 		return;
 	}
 }
