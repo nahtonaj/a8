@@ -59,11 +59,12 @@ public class MySpaceship implements Spaceship {
 		}
 		NodeStatus best = null;
 		for(NodeStatus ns: n) {
-			if(visited.containsKey(ns))
-				continue;
-			if(best == null) best = ns;
-			if(ns.compareTo(best) > 0)
-				best = ns;
+			if(!visited.containsKey(ns.id())) {
+				if(best == null) best = ns;
+				else if(ns.compareTo(best) > 0) {
+					best = ns;
+				}
+			}
 		}
 		return best;
 	}
