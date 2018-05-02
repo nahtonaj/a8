@@ -8,6 +8,7 @@ import models.NodeStatus;
 import controllers.SearchPhase;
 
 import java.util.HashMap;
+import java.util.List;
 
 import controllers.RescuePhase;
 
@@ -52,14 +53,15 @@ public class MySpaceship implements Spaceship {
 	}
 	
 	private NodeStatus max(NodeStatus[] n, SearchPhase state) {
-		if(n.length == 0) {
+		if(n.length == 1) {
 			visited.put(n[0].id(), true);
 			return n[0];
 		}
-		NodeStatus best = n[0];
+		NodeStatus best = null;
 		for(NodeStatus ns: n) {
-			if(visited.get(ns.id()) != null)
+			if(visited.containsKey(ns))
 				continue;
+			if(best == null) best = ns;
 			if(ns.compareTo(best) > 0)
 				best = ns;
 		}
@@ -85,5 +87,9 @@ public class MySpaceship implements Spaceship {
 	@Override
 	public void rescue(RescuePhase state) {
 		// TODO: Complete the rescue mission and collect gems
+		List<Node> ll = Paths.minPath(state.currentNode(), state.earth());
+		for(Node n: ll) {
+			state.moveTo(n);
+		}
 	}
 }
