@@ -6,10 +6,14 @@ import models.Node;
 import models.NodeStatus;
 
 import controllers.SearchPhase;
+
+import java.util.HashMap;
+
 import controllers.RescuePhase;
 
 /** An instance implements the methods needed to complete the mission. */
 public class MySpaceship implements Spaceship {
+	private HashMap<Integer, Boolean> visited = new HashMap<Integer, Boolean>();
 
 	/** The spaceship is on the location given by parameter state.
 	 * Move the spaceship to Planet X and then return (with the spaceship is on
@@ -38,6 +42,28 @@ public class MySpaceship implements Spaceship {
 	@Override
 	public void search(SearchPhase state) {
 		// TODO: Find the missing spaceship
+		if(state.onPlanetX())
+			return;
+		visited.put(state.currentID(), true);
+		NodeStatus ns = max(state.neighbors(), state);
+		state.moveTo(ns.id());
+		search(state);
+		
+	}
+	
+	private NodeStatus max(NodeStatus[] n, SearchPhase state) {
+		if(n.length == 0) {
+			visited.put(n[0].id(), true);
+			return n[0];
+		}
+		NodeStatus best = n[0];
+		for(NodeStatus ns: n) {
+			if(visited.get(ns.id()) != null)
+				continue;
+			if(ns.compareTo(best) > 0)
+				best = ns;
+		}
+		return best;
 	}
 
 	/** The spaceship is on the location given by state. Get back to Earth
