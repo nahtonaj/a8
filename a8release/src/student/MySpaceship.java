@@ -95,13 +95,53 @@ public class MySpaceship implements Spaceship {
 	@Override
 	public void rescue(RescuePhase state) {
 		// TODO: Complete the rescue mission and collect gems
-		LinkedList<Node> ll = (LinkedList) Paths.minPath(state.currentNode(), state.earth());
-		ll.removeLast();
-		int d = ll.size();
-		for(int i = 0; i < d; i++) {
-			state.moveTo(ll.getLast());
-			ll.removeLast();
-		}
-		return;
+		LinkedList<Node> shortestPathtoEarth = (LinkedList) Paths.minPath(state.currentNode(), state.earth());
+		
 	}
+	
+	public LinkedList<Node> addGemPath(LinkedList<Node> ll, RescuePhase state) {
+		int sumLengths = 0;
+		int maxLength = 0;
+		int maxLengthIndex = 0;
+		int currLength = 0;
+		int maxGemIndex = 0;
+		int sumGems = 0;
+		int gemfuelratio = 1;
+		int currGems = ll.get(0).gems();
+		int maxGems = currGems;
+		LinkedList<Integer> lengths = new LinkedList<Integer>();
+		
+		Node currNode;
+		for(int i=1; i<ll.size(); i++) {
+			currNode = ll.get(i);
+			currGems = currNode.gems();
+			currLength = ll.get(i-1).getEdge(currNode).fuelNeeded();
+			lengths.add(currLength);
+			sumLengths += currLength;
+			sumGems += currGems;
+			if(currGems > maxGems) maxGems = currGems; maxGemIndex = i;
+			if(currLength > maxLength) maxLength = currLength; maxLengthIndex = i-1;
+		}
+		Node bestNode = currNode;
+		int prevEdgelength = 0;
+		int nextEdgelength = 0;
+		int extensionlength = 0;
+		int currentlength = 0;
+		for(int j = ll.size()-2; j >0; j--) {
+			currNode.neighbors().forEach((n,v) -> {
+				nextEdgelength = n.getEdge(ll.get(j+1)).length;
+				prevEdgelength = n.getEdge(ll.get(j-1)).length;
+				if(nextEdgelength!=null && prevEdgelength!=null) {
+					extensionlength = prevEdgelength + nextEdgelength;
+					currentlength = lengths.get(j+1)+lengths.get(j);
+					if(n.gems()/extensionlength > currGems/currentlength
+							&& sumLengths-currLength+extensionlength < state.fuelRemaining()) {
+						
+					}
+				}
+			});
+		}
+		
+	}
+	
 }
