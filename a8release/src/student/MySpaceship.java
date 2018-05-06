@@ -95,11 +95,19 @@ public class MySpaceship implements Spaceship {
 	@Override
 	public void rescue(RescuePhase state) {
 		// TODO: Complete the rescue mission and collect gems
-		LinkedList<Node> shortestPathtoEarth = (LinkedList) Paths.minPath(state.currentNode(), state.earth());
+		LinkedList<Node> shortestPathtoEarth = (LinkedList<Node>) Paths.minPath(state.currentNode(), state.earth());
+		LinkedList<Node> gemPath = addGemPath(shortestPathtoEarth, state);
+		gemPath.poll();
+		while(gemPath != null && !gemPath.isEmpty()) {
+			state.moveTo(gemPath.poll());
+		}
 		
 	}
 	
 	public LinkedList<Node> addGemPath(LinkedList<Node> ll, RescuePhase state) {
+		if(ll.isEmpty()) {
+			return null;
+		}
 		int sumLengths = 0;
 		int maxLength = 0;
 		int maxLengthIndex = 0;
@@ -111,36 +119,48 @@ public class MySpaceship implements Spaceship {
 		int maxGems = currGems;
 		LinkedList<Integer> lengths = new LinkedList<Integer>();
 		
-		Node currNode;
-		for(int i=1; i<ll.size(); i++) {
-			currNode = ll.get(i);
-			currGems = currNode.gems();
-			currLength = ll.get(i-1).getEdge(currNode).fuelNeeded();
-			lengths.add(currLength);
-			sumLengths += currLength;
-			sumGems += currGems;
-			if(currGems > maxGems) maxGems = currGems; maxGemIndex = i;
-			if(currLength > maxLength) maxLength = currLength; maxLengthIndex = i-1;
-		}
-		Node bestNode = currNode;
-		int prevEdgelength = 0;
-		int nextEdgelength = 0;
+		Node currNode = null;
+//		for(int i=1; i<ll.size(); i++) {
+//			currNode = ll.get(i);
+//			currGems = currNode.gems();
+//			currLength = ll.get(i-1).getEdge(currNode).fuelNeeded();
+//			lengths.add(currLength);
+//			sumLengths += currLength;
+//			sumGems += currGems;
+//			if(currGems > maxGems) maxGems = currGems; maxGemIndex = i;
+//			if(currLength > maxLength) maxLength = currLength; maxLengthIndex = i-1;
+//		}
+		sumLengths = Paths.pathWeight(ll);
+
+		Edge nextEdge = null;
+		Edge prevEdge = null;
 		int extensionlength = 0;
 		int currentlength = 0;
-		for(int j = ll.size()-2; j >0; j--) {
-			currNode.neighbors().forEach((n,v) -> {
-				nextEdgelength = n.getEdge(ll.get(j+1)).length;
-				prevEdgelength = n.getEdge(ll.get(j-1)).length;
-				if(nextEdgelength!=null && prevEdgelength!=null) {
-					extensionlength = prevEdgelength + nextEdgelength;
-					currentlength = lengths.get(j+1)+lengths.get(j);
-					if(n.gems()/extensionlength > currGems/currentlength
-							&& sumLengths-currLength+extensionlength < state.fuelRemaining()) {
-						
+		for(int j = ll.size()-2; j > 1; j--) {
+			currNode = ll.get(j);
+			for(Node n : currNode.neighbors().keySet()) {
+				nextEdge = n.getEdge(ll.get(j+1));
+				prevEdge = n.getEdge(ll.get(j-1));
+				if(nextEdge!=null && prevEdge!=null) {
+					extensionlength = prevEdge.length + nextEdge.length;
+					if(j+1 < lengths.size()) {
+						currentlength = lengths.get(j+1)+lengths.get(j);
+					} else {
+						currentlength = lengths.get(j);
+					}
+					if(//n.gems()/extensionlength > currGems/currentlength
+							 sumLengths+extensionlength < state.fuelRemaining()) {
+						//ll.remove(j);
+						ll.add(j, n);
+						List<Node> pathBack = Paths.minPath(n, ll.get(j+1));
+						for(int k=0; k<pathBack.size(); k++) {
+							ll.add(j+k+1, pathBack.get(k));
+						}
+						System.out.println("added node");
 					}
 				}
-			});
-		}
+			}
+		} return ll;
 		
 	}
 	
