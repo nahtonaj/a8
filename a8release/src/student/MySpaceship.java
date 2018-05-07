@@ -105,10 +105,7 @@ public class MySpaceship implements Spaceship {
 	@Override
 	public void rescue(RescuePhase state) {
 		// TODO: Complete the rescue mission and collect gems
-<<<<<<< HEAD
 
-=======
->>>>>>> 21a27b9a8a92edaf146c4492394b84bd703a9798
 		depleted = new HashMap<Node, Boolean>();
 		backToEarth(state);
 	}
@@ -170,8 +167,5 @@ public class MySpaceship implements Spaceship {
 		}
 		return sum;
 	}
-<<<<<<< HEAD
 
-=======
->>>>>>> 21a27b9a8a92edaf146c4492394b84bd703a9798
 }

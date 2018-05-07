@@ -65,7 +65,7 @@ public class Paths {
         // invariant: All the nodes from p's successor to the end are in
         //            path, in reverse order.
         while (p != null) {
-            path.add(0, p);
+            path.add(path.size(), p);
             p= data.get(p).backPtr;
         }
         return path;
